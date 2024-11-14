@@ -1,5 +1,5 @@
 package tetrisSimple
 
 fun main() {
-    println("Hello World!")
+    println("Hello World! " + (-1 % 5))
 }
