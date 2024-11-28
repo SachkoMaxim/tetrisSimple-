@@ -98,19 +98,31 @@ fun makeMoveDown(gameField: GameField): GameField {
 /**
  * Repeatedly move the figure down until it can no longer move.
  */
-fun playGame(gameField: GameField): GameField {
+fun playGame(gameField: GameField, printEachStep: Boolean): String {
+    val steps = StringBuilder()
     var currentGameField = gameField.copy().apply {
         this.figure = gameField.figure.map { it.copy() }.toMutableList()
     }
+    var stepNumber = 0
+
     while (true) {
+        if (printEachStep) {
+            steps.append("STEP $stepNumber:\n${makeFieldToString(currentGameField)}\n\n")
+        }
+
         var newGameField = currentGameField.copy().apply {
             this.figure = currentGameField.figure.map { it.copy() }.toMutableList()
         }
         newGameField = makeMoveDown(newGameField)
         if (newGameField.equals(currentGameField)) break
         currentGameField = newGameField
+        stepNumber++
     }
-    return currentGameField
+
+    if (printEachStep) {
+        return steps.toString().trimEnd('\n')
+    }
+    return makeFieldToString(currentGameField)
 }
 
 /**

@@ -508,7 +508,7 @@ class GameLogicTest {
         )
 
         // When
-        val result = playGame(gameField)
+        val result = playGame(gameField, false)
 
         // Then
         val expectedGameField = GameField(
@@ -518,7 +518,7 @@ class GameLogicTest {
             emptyList()
         )
 
-        assertEquals(expectedGameField, result)
+        assertEquals(makeFieldToString(expectedGameField), result)
     }
 
     @Test
@@ -532,7 +532,7 @@ class GameLogicTest {
         )
 
         // When
-        val result = playGame(gameField)
+        val result = playGame(gameField, false)
 
         // Then
         val expectedGameField = GameField(
@@ -542,7 +542,7 @@ class GameLogicTest {
             listOf(Point(4, 3))
         )
 
-        assertEquals(expectedGameField, result)
+        assertEquals(makeFieldToString(expectedGameField), result)
     }
 
     @Test
@@ -556,10 +556,10 @@ class GameLogicTest {
         )
 
         // When
-        val result = playGame(gameField)
+        val result = playGame(gameField, false)
 
         // Then
-        assertEquals(gameField, result)
+        assertEquals(makeFieldToString(gameField), result)
     }
 
     @Test
@@ -573,10 +573,131 @@ class GameLogicTest {
         )
 
         // When
-        val result = playGame(gameField)
+        val result = playGame(gameField, false)
 
         // Then
-        assertEquals(gameField, result)
+        assertEquals(makeFieldToString(gameField), result)
+    }
+
+    @Test
+    fun `playGame with printEachStep should make the figure fall to the bottom and show all steps`() {
+        // Given
+        val gameField = GameField(
+            5,
+            6,
+            listOf(Point(0, 2), Point(1, 2), Point(1, 3)),
+            emptyList()
+        )
+
+        // When
+        val result = playGame(gameField, true)
+
+        // Then
+        val expectedResult = """
+            STEP 0:
+            ..p...
+            ..pp..
+            ......
+            ......
+            ......
+
+            STEP 1:
+            ......
+            ..p...
+            ..pp..
+            ......
+            ......
+
+            STEP 2:
+            ......
+            ......
+            ..p...
+            ..pp..
+            ......
+
+            STEP 3:
+            ......
+            ......
+            ......
+            ..p...
+            ..pp..
+        """.trimIndent()
+
+        assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `playGame with printEachStep should make the figure fall before there is a collision and show all steps`() {
+        // Given
+        val gameField = GameField(
+            5,
+            6,
+            listOf(Point(0, 2), Point(1, 2), Point(1, 3)),
+            listOf(Point(4, 3))
+        )
+
+        // When
+        val result = playGame(gameField, true)
+
+        // Then
+        val expectedResult = """
+            STEP 0:
+            ..p...
+            ..pp..
+            ......
+            ......
+            ...#..
+
+            STEP 1:
+            ......
+            ..p...
+            ..pp..
+            ......
+            ...#..
+
+            STEP 2:
+            ......
+            ......
+            ..p...
+            ..pp..
+            ...#..
+        """.trimIndent()
+
+        assertEquals(expectedResult, result)
+    }
+
+    @Test
+    fun `playGame with printEachStep should return the initial game field if there is a collision already and show step 0`() {
+        // Given
+        val gameField = GameField(
+            5,
+            6,
+            listOf(Point(0, 2), Point(1, 2), Point(1, 3)),
+            listOf(Point(2, 3))
+        )
+
+        // When
+        val result = playGame(gameField, true)
+
+        // Then
+        assertEquals("STEP 0:\n${makeFieldToString(gameField)}", result)
+    }
+
+    @Test
+    fun `playGame with printEachStep should return the initial game field if the figure at the bottom of the field and show step 0`() {
+        // Given
+        val gameField = GameField(
+            5,
+            6,
+            listOf(Point(3, 2), Point(4, 2), Point(4, 3)),
+            emptyList()
+        )
+
+        // When
+        val result = playGame(gameField, true)
+
+        // Then
+        assertEquals("STEP 0:\n${makeFieldToString(gameField)}", result)
     }
 
     @Test
@@ -633,7 +754,7 @@ class GameLogicTest {
     }
 
     @Test
-    fun `makeFieldToString should print the output string after figure drop down`() {
+    fun `playGame should print the output string after figure drop down`() {
         // Given
         val stringField = """
             5 6
@@ -646,12 +767,11 @@ class GameLogicTest {
         val gameField = parseField(stringField)
 
         // When
-        val newGameField = playGame(gameField)
-        val newGameFieldString = makeFieldToString(newGameField)
+        val newGameField = playGame(gameField, false)
 
         // Then
         val expectedOutput = "......\n......\n##..##\n##p.##\n##pp##"
 
-        assertEquals(expectedOutput, newGameFieldString)
+        assertEquals(expectedOutput, newGameField)
     }
 }
